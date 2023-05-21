@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Extension Popup</title>
+  <script src="popup.js"></script>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>KICK ENHANCER</h1>
+  <h2>Mention notification</h2>
+  <h3>Choose sound (more sounds soon)</h3>
+  <select name="soundFileSelect" id="soundFileSelect">
+    <option value="default">default</option>
+  </select>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="100" value="50" class="slider" id="volumeRange">
+  </div>
+  <h3>Volume</h3>
+  <span id="volumeOutput"></span>
+</body>
+</html>

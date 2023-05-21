@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "name": "Kick Enhancer",
+    "version": "0.1",
+    "description": "Extension for kick.com. Sound notification after user is mention. Emote names autocompletion, message bumps and further development  in plans",
+    "permissions": [
+      "activeTab",
+      "https://kick.com/*",
+      "storage"
+    ],
+    "browser_action": {
+      "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+      },
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": true
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://kick.com/*"],
+        "js": ["content.js"],
+        "run_at": "document_end"
+      }
+    ],
+    "icons": {
+      "128": "icons/icon128.png"
+    }
+  }
