@@ -1,37 +1,52 @@
-const targetNode = document.body;
+const targetNode = document.querySelector('#app');
 let chatContainer = null;
 
-const observer = new MutationObserver(function(mutationsList) {
+function playNotification(volumeLevel){
+  const notificationURL = chrome.runtime.getURL('sounds/notification.mp3');
+  const notification = new Audio(notificationURL);
+  notification.volume = volumeLevel / 100;
+  notification.play();
+}
+
+// finds chat container
+const observer = new MutationObserver(async function(mutationsList) {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
         for (const addedNode of mutation.addedNodes) {
             if (addedNode instanceof HTMLElement && addedNode.hasAttribute('data-chat-entry')) {
-                // Perform actions for the desired <div> element
                 observer.disconnect();
                 chatContainer = addedNode.parentElement;
-            
-            const newObserver = new MutationObserver(function(newMutationsList) {
-                for (const newMutation of newMutationsList) {
-                  if (newMutation.type === 'childList') {
-                    for (const addedMessage of newMutation.addedNodes) {
-                        if (addedMessage instanceof HTMLElement && addedMessage.firstChild.classList.contains('border-primary')) {
-                            chrome.runtime.sendMessage({ action: 'playAudio'});
-                        }
-                    }
-                  }
-                }
-              });
-    
-              // Start observing the new target node for changes
-              newObserver.observe(chatContainer, { childList: true, subtree: true });
-              return;
+                
+                await setupNewMessageObserver(chatContainer);
+                return;
             }
           }
         }
       }
     });
-    
 
-// Start observing the target node for changes
+// finds new message with user mentioned
+function setupNewMessageObserver(container) {
+  return new Promise(resolve => {
+    const messageObserver = new MutationObserver(function(mutationsList) {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+          for (const addedNode of mutation.addedNodes) {
+            if (addedNode instanceof HTMLElement && addedNode.firstChild.classList.contains('border-primary')) {
+              chrome.storage.local.get('volumeLevel', function(data) {
+                const volumeLevel = data.volumeLevel || 50; // Default volume level if not set
+                playNotification(volumeLevel);
+              });
+            }
+          }
+        }
+      }
+    });
+
+    messageObserver.observe(container, { childList: true, subtree: true });
+    resolve();
+  });
+}
+
 observer.observe(targetNode, { childList: true, subtree: true });
 
